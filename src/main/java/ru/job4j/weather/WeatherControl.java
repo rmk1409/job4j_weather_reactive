@@ -27,8 +27,20 @@ public class WeatherControl {
         return Flux.zip(data, delay).map(Tuple2::getT1);
     }
 
+    @GetMapping(value = "/cityGreatThan/{temperature}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Weather> all(@PathVariable Integer temperature) {
+        Flux<Weather> data = weathers.findByTemperature(temperature);
+        Flux<Long> delay = Flux.interval(Duration.ofSeconds(3));
+        return Flux.zip(data, delay).map(Tuple2::getT1);
+    }
+
     @GetMapping(value = "/get/{id}")
     public Mono<Weather> get(@PathVariable Integer id) {
         return weathers.findById(id);
+    }
+
+    @GetMapping(value = "/hottest")
+    public Mono<Weather> get() {
+        return weathers.findHottest();
     }
 }
